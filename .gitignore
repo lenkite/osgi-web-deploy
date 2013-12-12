@@ -1,1 +1,16 @@
 target/
+bin/
+.settings/
+OSGI-INF/
+.classpath
+.project
+*.iml
+*.log
+tags
+.idea
+**/*.iml
+bundles/**/META-INF/
+bundles/**/git.properties
+git.properties
+**/git.properties
+!bundles/**/src/main/resources/META-INF/
