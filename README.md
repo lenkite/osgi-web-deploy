@@ -5,30 +5,33 @@ Tool that allows deployment of OSGi bundles in any OSGI compliant container via 
 ## Description
 An OSGi compliant set of bundles with the following features:
 - Deploy Servlet Bundle that leverages RFC 1867 Upload of artifacts using the Servlet 3.0 API and deploys bundle artifacts. This servlet can be the target
-  of an `multipart-formdata` form. Currently only upload of bundle artifacts is possible. Will be extended to support OSGi subsystem artifacts in the future.
-- Deploy Servlet provides JSON based REST API that exposes metadata about uploaded bundles.
+  of an `multipart-formdata` form. Currently only deploy of bundle artifacts is possible. Can be extended to support OSGi subsystem artifacts in the future.
+- Deploy Servlet provides JSON based REST API that also metadata about uploaded bundles.
   The metadata is simplistic at the moment:
-	- 'name' 		 File name
-	- 'md5' 		 MD5 hash of uploaded artifact
-	- 'timestamp' 	 Timestamp 
-	- 'size' 		 Artifact File size in bytes
-	- 'url'			 Resource Url 
-	- 'directory'	 If resource is a directory
-	- 'symbolicName' Symbolic name if artifact is an OSGi bundle or OSGi subystem
-	- 'coordinate'   Can be null. This is a composite object that consists of three fields: {groupId, artifactId, version}.
-	- 'state'        If uploaded artifact is OSGI bundle, this is the OSGI bundle state in the runtime container.
-	- 'deployTime'   Time when some client last deployed this artifact in UTC milliseconds.
+	- `name` 	     	 File name
+	- `md5` 		     MD5 hash of uploaded artifact _NOT PRESENT CURRENTLY_
+	- `modifyTime`   Last modified time of artifact. Looks for `Bnd-LastModified` header if present. 
+                   Falls back to `MANIFEST.MF` modification time if not present. (which obviously is inaccurate)
+	- `size` 		     Artifact File size in bytes
+	- `url`			     Resource URL
+	- `symbolicName` Symbolic name if artifact is an OSGi bundle or OSGi subystem
+	- `coordinate`   Can be unspecified. This is a maven coordinate string. 
+                   The _maven BND plugin_ puts the maven POM in a subdirectory of `META-INF`. 
+                   If present this file is parsed for maven coordinates.
+	- `state`        If uploaded artifact is OSGI bundle and has been deployed in the OSGi runtime, this is the OSGI bundle
+                   state in the runtime container.
+	- `uploadTime`   Time when some client last uploaded this artifact in UTC milliseconds.
 - Separate Deploy WAB that provides a simple very simple form upload UI and exposes Deploy Servlet. Deploy Servlet is in a separate bundle from the WAB to allow
   users to leverage the deploy servlet independent of the web-app.  (WABS are generally highly environment specific).
 - Deploy WAB Currently does not have any role set. You can add roles and login configs to the web.xml yourself if you choose to use this WAB.
-- Deploy WAB context path is '/deploy'.
+- Deploy WAB context path is `/deploy`.
 - Deploy client bundle that provides an API to scan local  directory and upload all changed artifacts to the upload WAB. Timestamps are preserved.
 - Upload client shell script that leverages the upload client bundle and is invokable from the command line.
 
 ## Quick Start
 
 * [Download the latest release](https://provideCentralMavenLink)
-* Clone the repo: `git clone https://github.com/lenkite/osgi-http-upload` and build with Maven 3.0.4+.
+* Clone the repo: `git clone https://github.com/lenkite/osgi-http-upload` and build with Maven 3.0.5+.
 
 ## Deploy WAB UI
 
@@ -52,8 +55,8 @@ In other words by default the the deploy servlet handles all URL's who have a pa
         "symbolicName": "<Bundle-SymbolicName>",
         "version": "<Bundle-Version>",
         "size": <SizeInBytes>",
-        "lastModified": "<LastModifiedOfBundleInUTCMillis>", /*Checks Bnd-LastModified, falls back to 'deployedOn' */
-        "deployedOn": "<DeploymentTimeInUtcMillis>",
+        "modifyTime": "<LastModifiedOfBundleInUTCMillis>", /*Checks Bnd-LastModified, falls back to 'uploadTime' */
+        "uploadTime": "<DeploymentTimeInUtcMillis>",
     },
   ]
  }

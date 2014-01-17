@@ -1,4 +1,4 @@
-package org.osgiutil.httpupload.wab;
+package io.lenkite.osgi.deploy.wab;
 
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;

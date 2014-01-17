@@ -5,4 +5,4 @@
  * @author Tarun Elankath
  *
  */
-package org.osgiutil.httpupload.wab;
+package io.lenkite.osgi.deploy.wab;
